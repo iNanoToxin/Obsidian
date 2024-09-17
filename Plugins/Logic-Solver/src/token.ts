@@ -157,5 +157,19 @@ export function tokenize(input: string): Token[] | null
 export function getPrecedence(type: TokenType): number
 {
     // @ts-ignore
-    return LatexOperatorPrecedenceLookup[type];
+    return LatexOperatorPrecedenceLookup[type] ?? 0;
+}
+
+export function tokenToLatex(type: TokenType): string | null
+{
+    switch (type)
+    {
+        case TokenType.L_NEG: return "\\neg";
+        case TokenType.L_CON: return "\\land";
+        case TokenType.L_DIS: return "\\lor";
+        case TokenType.L_XOR: return "\\oplus";
+        case TokenType.L_IMP: return "\\to";
+        case TokenType.L_BIC: return "\\leftrightarrow";
+    }
+    return null;
 }

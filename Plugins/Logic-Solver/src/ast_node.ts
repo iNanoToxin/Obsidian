@@ -1,6 +1,6 @@
-import {getPrecedence, TokenType} from "./token";
+import {getPrecedence, tokenToLatex, TokenType} from "./token";
 
-export class AstNodeBase
+export class AstBase
 {
     type: TokenType;
 
@@ -8,20 +8,52 @@ export class AstNodeBase
     {
         this.type = type;
     }
+
+    getPrecedence(): number
+    {
+        return getPrecedence(this.type);
+    }
+
+    toString(): string
+    {
+        return ""
+    }
+
+    eval(): number
+    {
+        return 0;
+    }
 }
 
-export class Identifer extends AstNodeBase
+export class Identifer extends AstBase
 {
     name: string;
+    value: number;
 
     constructor(name: string)
     {
         super(TokenType.T_VAR);
         this.name = name;
+        this.value = 0;
+    }
+
+    setValue(value: number): void
+    {
+        this.value = value;
+    }
+
+    toString(): string
+    {
+        return this.name;
+    }
+
+    eval(): number
+    {
+        return this.value;
     }
 }
 
-export class BinaryOperation extends AstNodeBase
+export class BinaryOperation extends AstBase
 {
     lhs: AstNode;
     rhs: AstNode;
@@ -33,13 +65,51 @@ export class BinaryOperation extends AstNodeBase
         this.rhs = rhs;
     }
 
-    getPrecedence(): number
+    toString(): string
     {
-        return getPrecedence(this.type);
+        if (this.lhs == null || this.rhs == null)
+        {
+            throw new Error("lhs or rhs is null")
+        }
+
+        let op = tokenToLatex(this.type);
+        let lhs: string = this.lhs.toString();
+        let rhs: string = this.rhs.toString();
+
+        if (!(this.lhs instanceof Identifer) && this.lhs.getPrecedence() < getPrecedence(this.type))
+        {
+            lhs = `(${lhs})`;
+        }
+        if (!(this.rhs instanceof Identifer) && getPrecedence(this.type) > this.rhs.getPrecedence())
+        {
+            rhs = `(${rhs})`;
+        }
+        return `${lhs} ${op} ${rhs}`;
+    }
+
+    eval(): number
+    {
+        if (this.lhs && this.rhs)
+        {
+            switch (this.type)
+            {
+                case TokenType.L_CON:
+                    return this.lhs.eval() & this.rhs.eval();
+                case TokenType.L_DIS:
+                    return this.lhs.eval() | this.rhs.eval();
+                case TokenType.L_XOR:
+                    return this.lhs.eval() ^ this.rhs.eval();
+                case TokenType.L_IMP:
+                    return this.lhs.eval() <= this.rhs.eval() ? 1 : 0;
+                case TokenType.L_BIC:
+                    return this.lhs.eval() == this.rhs.eval() ? 1 : 0;
+            }
+        }
+        return 0;
     }
 }
 
-export class UnaryOperation extends AstNodeBase
+export class UnaryOperation extends AstBase
 {
     operand: AstNode;
 
@@ -49,10 +119,33 @@ export class UnaryOperation extends AstNodeBase
         this.operand = operand;
     }
 
-    getPrecedence(): number
+    toString(): string
     {
-        return getPrecedence(this.type);
+        if (this.operand == null)
+        {
+            throw new Error("operand is null")
+        }
+        let op = tokenToLatex(this.type);
+        let operand: string = this.operand.toString();
+
+        if (!(this.operand instanceof Identifer) && this.operand.getPrecedence() <= getPrecedence(this.type))
+        {
+            operand = `(${operand})`;
+        }
+        return `${op} ${operand}`;
+    }
+
+    eval(): number
+    {
+        if (this.operand)
+        {
+            switch (this.type)
+            {
+                case TokenType.L_NEG: return this.operand.eval() == 0 ? 1 : 0;
+            }
+        }
+        return 0;
     }
 }
 
-export type AstNode = AstNodeBase | null;
+export type AstNode = AstBase | null;
