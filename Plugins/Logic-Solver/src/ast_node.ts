@@ -1,4 +1,4 @@
-import {getPrecedence, tokenToLatex, TokenType} from "./token";
+import {getPrecedence, toLatexString, TokenType} from "./token";
 
 export class AstBase
 {
@@ -72,7 +72,7 @@ export class BinaryOperation extends AstBase
             throw new Error("lhs or rhs is null")
         }
 
-        let op = tokenToLatex(this.type);
+        let op = toLatexString(this.type);
         let lhs: string = this.lhs.toString();
         let rhs: string = this.rhs.toString();
 
@@ -125,7 +125,7 @@ export class UnaryOperation extends AstBase
         {
             throw new Error("operand is null")
         }
-        let op = tokenToLatex(this.type);
+        let op = toLatexString(this.type);
         let operand: string = this.operand.toString();
 
         if (!(this.operand instanceof Identifer) && this.operand.getPrecedence() <= getPrecedence(this.type))

@@ -1,27 +1,14 @@
 export enum TokenType
 {
-    /*// Variables
-    T_VAR,
-    // Grammar
-    G_LPAR,
-    G_RPAR,
-    // Logical Operators
-    L_NEG = "\\neg",
-    L_CON = "\\land",
-    L_DIS = "\\lor",
-    L_XOR = "\\oplus",
-    L_IMP = "\\to",
-    L_BIC = "\\leftrightarrow",*/
-
-    T_VAR = "TokenType.T_VAR",
-    G_LPAR = "TokenType.G_LPAR",
-    G_RPAR = "TokenType.G_RPAR",
-    L_NEG = "TokenType.L_NEG",
-    L_CON = "TokenType.L_CON",
-    L_DIS = "TokenType.L_DIS",
-    L_XOR = "TokenType.L_XOR",
-    L_IMP = "TokenType.L_IMP",
-    L_BIC = "TokenType.L_BIC"
+    T_VAR,// = "TokenType.T_VAR",
+    G_LPAR,// = "TokenType.G_LPAR",
+    G_RPAR,// = "TokenType.G_RPAR",
+    L_NEG,// = "TokenType.L_NEG",
+    L_CON,// = "TokenType.L_CON",
+    L_DIS,// = "TokenType.L_DIS",
+    L_XOR,// = "TokenType.L_XOR",
+    L_IMP,// = "TokenType.L_IMP",
+    L_BIC,// = "TokenType.L_BIC"
 }
 
 export class Token
@@ -63,7 +50,35 @@ export class Token
     }
 }
 
-const LatexOperatorLookup = {
+export function getPrecedence(type: TokenType): number
+{
+    switch (type)
+    {
+        case TokenType.L_BIC: return 1;
+        case TokenType.L_IMP: return 2;
+        case TokenType.L_XOR: return 3;
+        case TokenType.L_DIS: return 3;
+        case TokenType.L_CON: return 4;
+        case TokenType.L_NEG: return 5;
+    }
+    return 0;
+}
+
+export function toLatexString(type: TokenType): string | null
+{
+    switch (type)
+    {
+        case TokenType.L_NEG: return "\\neg";
+        case TokenType.L_CON: return "\\land";
+        case TokenType.L_DIS: return "\\lor";
+        case TokenType.L_XOR: return "\\oplus";
+        case TokenType.L_IMP: return "\\to";
+        case TokenType.L_BIC: return "\\leftrightarrow";
+    }
+    return null;
+}
+
+export const LatexOperatorLookup = {
     // L_NEG
     "\\neg": TokenType.L_NEG,
     "\\lnot": TokenType.L_NEG,
@@ -82,94 +97,3 @@ const LatexOperatorLookup = {
     // L_BIC
     "\\leftrightarrow": TokenType.L_BIC
 };
-
-const LatexOperatorPrecedenceLookup = {
-    [TokenType.L_BIC]: 1,
-    [TokenType.L_IMP]: 2,
-    [TokenType.L_XOR]: 3,
-    [TokenType.L_DIS]: 3,
-    [TokenType.L_CON]: 4,
-    [TokenType.L_NEG]: 5
-};
-
-export function tokenize(input: string): Token[] | null
-{
-    let tokens: Token[] = [];
-    let pos = 0;
-
-    while (pos < input.length)
-    {
-        switch (input[pos])
-        {
-            case "\\":
-            {
-                for (const [operator, type] of Object.entries(LatexOperatorLookup))
-                {
-                    if (input.startsWith(operator, pos))
-                    {
-                        tokens.push(new Token(type, operator));
-                        pos += operator.length;
-                        break;
-                    }
-                }
-                break;
-            }
-
-            case "(":
-            {
-                tokens.push(new Token(TokenType.G_LPAR, "("));
-                pos++;
-                break;
-            }
-            case ")":
-            {
-                tokens.push(new Token(TokenType.G_RPAR, ")"));
-                pos++;
-                break;
-            }
-            case " ":
-            {
-                pos++;
-                break;
-            }
-
-            default:
-            {
-                let regex = new RegExp("[a-zA-Z]+", "y");
-                regex.lastIndex = pos;
-
-                const match = regex.exec(input);
-                if (match)
-                {
-                    tokens.push(new Token(TokenType.T_VAR, match[0]));
-                    pos += match[0].length;
-                    break;
-                }
-
-                console.log(`ILLEGAL CHAR: ${input[pos]}`);
-                return null;
-            }
-        }
-    }
-    return tokens;
-}
-
-export function getPrecedence(type: TokenType): number
-{
-    // @ts-ignore
-    return LatexOperatorPrecedenceLookup[type] ?? 0;
-}
-
-export function tokenToLatex(type: TokenType): string | null
-{
-    switch (type)
-    {
-        case TokenType.L_NEG: return "\\neg";
-        case TokenType.L_CON: return "\\land";
-        case TokenType.L_DIS: return "\\lor";
-        case TokenType.L_XOR: return "\\oplus";
-        case TokenType.L_IMP: return "\\to";
-        case TokenType.L_BIC: return "\\leftrightarrow";
-    }
-    return null;
-}

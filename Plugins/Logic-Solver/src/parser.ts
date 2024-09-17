@@ -1,4 +1,4 @@
-import {getPrecedence, Token, tokenize, TokenType} from "./token";
+import {getPrecedence, LatexOperatorLookup, Token, TokenType} from "./token";
 import {AstNode, BinaryOperation, Identifer, UnaryOperation} from "./ast_node";
 
 export class Parser
@@ -9,15 +9,14 @@ export class Parser
 
     parse(source: string): AstNode
     {
-        let tokens = tokenize(source);
-        if (tokens == null)
+        this.tokens = [];
+        this.current = 0;
+        this.variables = {};
+
+        if (!this.tokenize(source))
         {
             return null;
         }
-
-        this.tokens = tokens;
-        this.current = 0;
-        this.variables = {};
         return this.parseExpression();
     }
 
@@ -34,6 +33,65 @@ export class Parser
     advance(): void
     {
         this.current++;
+    }
+
+    tokenize(input: string): boolean
+    {
+        let pos = 0;
+
+        while (pos < input.length)
+        {
+            switch (input[pos])
+            {
+                case "\\":
+                {
+                    for (const [operator, type] of Object.entries(LatexOperatorLookup))
+                    {
+                        if (input.startsWith(operator, pos))
+                        {
+                            this.tokens.push(new Token(type, operator));
+                            pos += operator.length;
+                            break;
+                        }
+                    }
+                    break;
+                }
+
+                case "(":
+                {
+                    this.tokens.push(new Token(TokenType.G_LPAR, "("));
+                    pos++;
+                    break;
+                }
+                case ")":
+                {
+                    this.tokens.push(new Token(TokenType.G_RPAR, ")"));
+                    pos++;
+                    break;
+                }
+                case " ":
+                {
+                    pos++;
+                    break;
+                }
+
+                default:
+                {
+                    let regex = new RegExp("[a-zA-Z]+", "y");
+                    regex.lastIndex = pos;
+
+                    const match = regex.exec(input);
+                    if (match)
+                    {
+                        this.tokens.push(new Token(TokenType.T_VAR, match[0]));
+                        pos += match[0].length;
+                        break;
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     parseExpression(): AstNode
