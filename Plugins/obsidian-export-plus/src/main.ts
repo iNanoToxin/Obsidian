@@ -45,7 +45,7 @@ export default class ExportPlus extends Plugin {
             },
         });
 
-        this.app.workspace.on("layout-change", this.updateOverlays.bind(this, this.settings.overlayEnabled));
+        this.app.workspace.on("layout-change", () => this.updateOverlays(this.settings.overlayEnabled));
         this.updateOverlays(this.settings.overlayEnabled);
 
         this.statusBar = new OverlayStatusBar(this);
