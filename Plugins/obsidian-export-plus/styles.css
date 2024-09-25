@@ -1,0 +1,6 @@
+.export-plus-overlay {
+    position: fixed;
+    z-index: 10000000;
+    border-radius: var(--radius-m);
+    pointer-events: none;
+}
