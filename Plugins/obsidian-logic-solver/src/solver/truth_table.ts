@@ -1,4 +1,4 @@
-import { App, MarkdownView, Notice } from "obsidian";
+import { App, Editor, Notice } from "obsidian";
 import { AstNode, BinaryOperation, UnaryOperation } from "../ast/ast_node";
 import { Parser } from "../ast/parser";
 import { InputModal } from "../ui/menu";
@@ -97,14 +97,14 @@ function generateTruthTable(expression: string): string | null {
 }
 
 export function getTruthTable(app: App) {
-    const view = app.workspace.getActiveViewOfType(MarkdownView);
+    const editor: Editor | undefined = app.workspace.activeEditor?.editor;
 
-    if (view) {
+    if (editor) {
         new InputModal(app, (input: string) => {
             const truthTable = generateTruthTable(input);
 
             if (truthTable) {
-                view.editor.replaceSelection(truthTable);
+                editor.replaceSelection(truthTable);
             } else {
                 new Notice("Error parsing latex equation.");
             }
@@ -113,10 +113,10 @@ export function getTruthTable(app: App) {
 }
 
 export function copyTruthTable(app: App) {
-    const view = app.workspace.getActiveViewOfType(MarkdownView);
-    const selection = view?.editor.getSelection();
+    const editor: Editor | undefined = app.workspace.activeEditor?.editor;
+    const selection: string | undefined = editor?.getSelection();
 
-    if (view && selection) {
+    if (selection) {
         const truthTable = generateTruthTable(selection);
 
         if (truthTable) {
