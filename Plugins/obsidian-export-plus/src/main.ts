@@ -3,12 +3,14 @@ import { CaptureInputModal } from "./ui/capture_input";
 import { CanvasOverlay } from "./ui/canvas_overlay";
 import { DEFAULT_SETTINGS, ExportPlusSettings } from "./settings/settings";
 import { ExportSettings } from "./ui/export_settings";
-import { OverlayStatusBar } from "./ui/status_bar";
+import { OverlayStatusBar } from "./ui/overlay_status_bar";
+import { ThemeStatusBar } from "./ui/theme_status_bar";
 
 export default class ExportPlus extends Plugin {
     settings: ExportPlusSettings;
     overlays: CanvasOverlay[] = [];
-    statusBar: OverlayStatusBar;
+    overlayStatusBar: OverlayStatusBar;
+    themeStatusBar: ThemeStatusBar;
 
     async onload() {
         await this.loadSettings();
@@ -48,18 +50,24 @@ export default class ExportPlus extends Plugin {
         this.app.workspace.on("layout-change", () => this.updateOverlays(this.settings.overlayEnabled));
         this.updateOverlays(this.settings.overlayEnabled);
 
-        this.statusBar = new OverlayStatusBar(this);
+        this.overlayStatusBar = new OverlayStatusBar(this);
+        this.themeStatusBar = new ThemeStatusBar(this);
         new ExportSettings(this);
+    }
+
+    async onunload() {
+        this.updateOverlays(false);
+        this.themeStatusBar.setPrintTheme(false);
     }
 
     async toggleOverlays() {
         this.settings.overlayEnabled = !this.settings.overlayEnabled;
         this.updateOverlays(this.settings.overlayEnabled);
-        this.statusBar?.update();
+        this.overlayStatusBar?.update();
         await this.saveSettings();
     }
 
-    updateOverlays(state: boolean): void {
+    updateOverlays(state: boolean) {
         this.overlays.forEach((overlay: CanvasOverlay) => overlay.unload());
         this.overlays.length = 0;
 

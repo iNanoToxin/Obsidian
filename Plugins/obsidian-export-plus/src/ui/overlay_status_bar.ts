@@ -1,7 +1,5 @@
 import ExportPlus from "src/main";
 
-
-
 export class OverlayStatusBar {
     statusBarItemEl: HTMLElement;
     plugin: ExportPlus;
@@ -17,6 +15,6 @@ export class OverlayStatusBar {
     }
 
     update() {
-        this.statusBarItemEl.setText(`overlay: ${this.plugin.settings.overlayEnabled ? "on" : "off"}`);
+        this.statusBarItemEl.setText(`print-overlay: ${this.plugin.settings.overlayEnabled ? "on" : "off"}`);
     }
 }

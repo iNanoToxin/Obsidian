@@ -8,7 +8,18 @@ export interface ExportPlusSettings {
     overlayColor: HexString;
     overlayTransparency: number;
     overlayEnabled: boolean;
+    printThemeEnabled: boolean;
+    fileSaveOption: string;
+    fileSavePath: string;
+    themeBlackAndWhite: boolean;
 }
+
+export const ATTACHMENT_LOCATION_OPTIONS: Record<string, string> = {
+    root: "Vault folder",
+    folder: "In the folder specified below",
+    current: "Same folder as current file",
+    subfolder: "In subfolder under current folder",
+};
 
 export const DEFAULT_SETTINGS: ExportPlusSettings = {
     scale: 0,
@@ -18,4 +29,9 @@ export const DEFAULT_SETTINGS: ExportPlusSettings = {
     overlayColor: "#ff0000",
     overlayTransparency: 0.15,
     overlayEnabled: false,
+    printThemeEnabled: false,
+    themeBlackAndWhite: false,
+
+    fileSaveOption: "root",
+    fileSavePath: "/",
 };

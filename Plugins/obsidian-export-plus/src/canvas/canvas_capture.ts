@@ -1,17 +1,25 @@
-import { Notice } from "obsidian";
+import { App, Notice, TAbstractFile, TFile } from "obsidian";
 import { Canvas } from "./canvas_interface";
 import { PropertyManager } from "../util/property_manager";
 import { CaptureInfo } from "./canvas_info";
+import ExportPlus from "src/main";
+import { ProgressBarPopup } from "src/ui/progress_bar_popup";
 
 export class CanvasCapture {
     private canvas: Canvas;
     private delay: number;
     private captureInfo: CaptureInfo;
     private propertyManager: PropertyManager;
+    private plugin: ExportPlus;
+    private progressBar: ProgressBarPopup;
+    private cancelled: boolean;
 
-    constructor(canvas: Canvas, zoom: number, delay: number) {
+    constructor(plugin: ExportPlus, canvas: Canvas, zoom: number) {
+        this.plugin = plugin;
         this.canvas = canvas;
-        this.delay = delay;
+        this.delay = plugin.settings.delay;
+        this.cancelled = false;
+        this.progressBar = new ProgressBarPopup();
         this.propertyManager = new PropertyManager();
         this.captureInfo = new CaptureInfo(canvas);
         this.captureInfo.setZoom(zoom);
@@ -29,22 +37,9 @@ export class CanvasCapture {
         }
     }
 
-    private getFilePath(): Promise<string | null> {
-        return (this.canvas.wrapperEl.win as any).electron.remote.dialog
-            .showSaveDialog({
-                defaultPath: this.canvas.view.file.basename + ".png",
-                filters: [
-                    { name: "PNG Files", extensions: ["png"] },
-                    { name: "All Files", extensions: ["*"] },
-                ],
-                properties: ["showOverwriteConfirmation"],
-            })
-            .then((result: { canceled: boolean; filePath?: string }) => {
-                if (result.canceled || !result.filePath) {
-                    return null;
-                }
-                return result.filePath;
-            });
+    cancel() {
+        this.progressBar.close();
+        this.cancelled = true;
     }
 
     async capture() {
@@ -53,17 +48,22 @@ export class CanvasCapture {
             return;
         }
 
-        const filePath = "C:/Users/Dylan/Documents/Obsidian Vault/Notes/test.png";
-        // const filePath = await this.getFilePath();
-        // if (!filePath) {
-        //     new Notice("Cancelled canvas capture.");
-        //     return;
-        // }
-
         const { x, y, zoom, readonly } = this.canvas;
         const { image } = this.captureInfo;
-
         try {
+            let win = this.canvas.wrapperEl.win;
+            let w = win.outerWidth * 0.6;
+            let h = win.outerHeight * 0.1;
+            let x = win.screenX + win.outerWidth / 2 - w / 2;
+            let y = win.screenY + win.outerHeight / 2 - h / 2;
+
+            this.cancelled = false;
+            this.progressBar.open(x, y, w, h);
+            this.progressBar.setMessage("Rendering tiles...");
+            this.progressBar.el.createEl("button", { cls: "mod-cta", text: "Stop" }, (button: HTMLButtonElement) => {
+                button.style.marginTop = "20px";
+                button.onClickEvent(this.cancel.bind(this));
+            });
             this.setCanvasCaptureState(true, readonly);
 
             const fullCanvas = this.canvas.wrapperEl.doc.createElement("canvas");
@@ -73,7 +73,40 @@ export class CanvasCapture {
             await this.captureTiles(fullCanvas)
                 .then(() => CanvasCapture.canvasToBuffer(fullCanvas))
                 .then((buffer: Buffer) => {
-                    return window.require("original-fs").promises.writeFile(filePath, buffer);
+                    let vault = this.plugin.app.vault;
+                    let suffix = "";
+                    let path = "";
+                    let counter = 0;
+
+                    do {
+                        switch (this.plugin.settings.fileSaveOption) {
+                            case "folder": {
+                                path = `${this.plugin.settings.fileSavePath}/${this.canvas.view.file.basename}${suffix}.png`;
+                                break;
+                            }
+                            case "current":{
+                                path = `${this.canvas.view.file.parent.path}/${this.canvas.view.file.basename}${suffix}.png`;
+                                break;
+                            }
+                            case "subfolder":{
+                                path = `${this.canvas.view.file.parent.path}/${this.plugin.settings.fileSavePath}/${this.canvas.view.file.basename}${suffix}.png`;
+                                break;
+                            }
+                            default: {
+                                path = `${this.canvas.view.file.basename}${suffix}.png`;
+                                break;
+                            }
+                        }
+                        suffix = ` (${++counter})`;
+                    } while (vault.getAbstractFileByPath(path));
+
+                    const folderPath = path.substring(0, path.lastIndexOf("/"));
+                    const folder = vault.getAbstractFileByPath(folderPath);
+
+                    if (!folder) {
+                        vault.createFolder(folderPath);
+                    }
+                    return vault.createBinary(path, buffer);
                 })
                 .then(() => {
                     new Notice("Successfully saved canvas.");
@@ -88,6 +121,7 @@ export class CanvasCapture {
         } finally {
             this.setCanvasCaptureState(false, readonly);
             this.canvas.setViewport(x, y, zoom);
+            this.progressBar.close();
         }
     }
 
@@ -124,13 +158,15 @@ export class CanvasCapture {
     }
 
     private async captureTiles(canvas: HTMLCanvasElement) {
-        const { image, boundingBox, scale, zoom, width, height, pixelRatio } = this.captureInfo;
-
         // Returns an object that provides methods and properties for drawing and manipulating images
         const context = canvas.getContext("2d");
         if (!context) {
             throw new Error("Failed to get canvas context.");
         }
+
+        await sleep(this.delay);
+
+        const { image, boundingBox, scale, zoom, width, height, pixelRatio } = this.captureInfo;
 
         // Enlarge canvas and take screenshots of each tile
         for (let y = 0; y < image.tileCountY; y++) {
@@ -142,14 +178,27 @@ export class CanvasCapture {
                     zoom
                 );
 
+                console.log(this.captureInfo.height, height);
+
                 // Somewhat reliable wait time until next render
                 while (this.canvas.frame !== 0) {
                     await sleep(this.delay);
                 }
 
+                console.log(this.captureInfo.height, height);
+
+                if (this.cancelled) {
+                    throw new Error("Cancelled capture.")
+                }
+
                 if (this.captureInfo.changed(width, height, pixelRatio)) {
                     throw new Error("Viewport changed size.");
                 }
+
+                let total = image.tileCountX * image.tileCountY;
+                let current = x + y * image.tileCountX + 1;
+                this.progressBar.setMessage(`Rendering tiles... (${current}/${total})`);
+                this.progressBar.setProgress(current, total);
 
                 await this.captureScreen().then((image: HTMLImageElement) => {
                     context.drawImage(image, x * width * pixelRatio, y * height * pixelRatio);

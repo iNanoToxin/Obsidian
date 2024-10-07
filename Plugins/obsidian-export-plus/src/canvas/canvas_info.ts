@@ -69,6 +69,9 @@ export class CaptureInfo {
     }
 
     changed(width: number, height: number, pixelRatio: number): boolean {
-        return this.width != width || this.height != height || this.pixelRatio != pixelRatio;
+        let w = Math.abs(this.width - width) <= 10;
+        let h = Math.abs(this.height - height) <= 10;
+        let p = Math.abs(this.pixelRatio - pixelRatio) <= 1e-3;
+        return !(w && h && p);
     }
 }

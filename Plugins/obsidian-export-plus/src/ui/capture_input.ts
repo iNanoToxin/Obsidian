@@ -1,4 +1,4 @@
-import { ButtonComponent, Modal, Setting, SliderComponent } from "obsidian";
+import { ButtonComponent, Modal, Setting, SliderComponent, ToggleComponent } from "obsidian";
 import { CanvasCapture } from "../canvas/canvas_capture";
 import { Canvas } from "../canvas/canvas_interface";
 import { CaptureInfo } from "../canvas/canvas_info";
@@ -74,13 +74,33 @@ export class CaptureInputModal extends Modal {
                 slider.getValuePretty = () => `${Math.round(slider.getValue()).toString()}ms`;
             });
 
+        let printThemeSetting = new Setting(this.contentEl);
+        printThemeSetting
+            .setName("Enable Print Theme")
+            .setDesc("Saves canvas in black and white and also reduces wasted space.")
+            .addToggle((toggle: ToggleComponent) => {
+                toggle.setValue(this.plugin.settings.printThemeEnabled).onChange(async (value: boolean) => {
+                    this.plugin.settings.printThemeEnabled = value;
+                    await this.plugin.saveSettings();
+                });
+            });
+
         new Setting(this.contentEl).addButton((button: ButtonComponent) => {
             button
                 .setButtonText("Save")
                 .setCta()
-                .onClick(() => {
+                .onClick(async () => {
+                    let enabled: boolean = this.plugin.themeStatusBar.enabled;
+
                     this.close();
-                    new CanvasCapture(this.canvas, captureInfo.zoom, this.plugin.settings.delay).capture();
+                    // Remove overlays and enable print theme if enabled
+                    this.plugin.updateOverlays(false);
+                    this.plugin.themeStatusBar.setPrintTheme(this.plugin.settings.printThemeEnabled);
+                    // Capture canvas
+                    await new CanvasCapture(this.plugin, this.canvas, captureInfo.zoom).capture();
+                    // Restore settings back to default
+                    this.plugin.updateOverlays(this.plugin.settings.overlayEnabled);
+                    this.plugin.themeStatusBar.setPrintTheme(enabled);
                 });
         });
     }
