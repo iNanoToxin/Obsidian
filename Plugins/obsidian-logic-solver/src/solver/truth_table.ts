@@ -40,8 +40,8 @@ function formatTruthTable(truthTable: TruthTable): string {
         Object.values(truthTable[expr]).map((value) => {
             // return value ? "T" : "F";
             return value
-                ? '<span style="color:rgb(60,181,53)">T</span>'
-                : '<span style="color:rgb(212,70,34)">F</span>';
+                ? '<span class="latex-true-value">$T$</span>'
+                : '<span class="latex-false-value">$F$</span>';
         })
     );
 
