@@ -1,7 +1,7 @@
 {
-    "name": "obsidian-logic-solver",
+    "name": "obsidian-canvas-util",
     "version": "1.0.0",
-    "description": "Solve logic problems using Latex.",
+    "description": "Extra functions for canvas cards.",
     "main": "main.js",
     "scripts": {
         "dev": "node esbuild.config.mjs",

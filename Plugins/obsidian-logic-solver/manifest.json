@@ -1,10 +1,10 @@
 {
-	"id": "obsidian-logic-solver",
-	"name": "Logic Solver",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Solve logic problems using Latex.",
-	"author": "iNanoToxin",
-	"authorUrl": "https://github.com/iNanoToxin",
-	"isDesktopOnly": false
+    "id": "obsidian-logic-solver",
+    "name": "Logic Solver",
+    "version": "1.0.0",
+    "minAppVersion": "0.15.0",
+    "description": "Solve logic problems using Latex.",
+    "author": "iNanoToxin",
+    "authorUrl": "https://github.com/iNanoToxin",
+    "isDesktopOnly": false
 }

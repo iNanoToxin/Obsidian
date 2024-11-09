@@ -1,10 +1,10 @@
 {
-	"id": "obsidian-export-plus",
-	"name": "Export+",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Export canvas as image and display paper overlay to find optimal space for printing.",
-	"author": "iNanoToxin",
-	"authorUrl": "https://github.com/iNanoToxin",
-	"isDesktopOnly": true
+    "id": "obsidian-export-plus",
+    "name": "Export+",
+    "version": "1.0.0",
+    "minAppVersion": "0.15.0",
+    "description": "Export canvas as image and display paper overlay to find optimal space for printing.",
+    "author": "iNanoToxin",
+    "authorUrl": "https://github.com/iNanoToxin",
+    "isDesktopOnly": true
 }

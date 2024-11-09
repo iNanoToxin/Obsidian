@@ -1,0 +1,9 @@
+{
+    "id": "obsidian-canvas-util",
+    "name": "Obsidian Canvas Utilities",
+    "version": "1.0.0",
+    "minAppVersion": "0.15.0",
+    "description": "Extra functions for canvas cards.",
+    "author": "iNanoToxin",
+    "isDesktopOnly": true
+}
