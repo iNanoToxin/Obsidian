@@ -11,6 +11,10 @@ const PRINT_STYLE = `
     padding: 0 !important;
 } */
 
+/* make all text on canvas black */
+div.canvas * {
+    color: #000000 !important
+}
 
 /* lists */
 .markdown-rendered ul>li,
