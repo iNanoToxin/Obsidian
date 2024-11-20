@@ -12,7 +12,7 @@ const PRINT_STYLE = `
 } */
 
 /* make all text on canvas black */
-div.canvas * {
+.theme-light div.canvas * {
     color: #000000 !important
 }
 
