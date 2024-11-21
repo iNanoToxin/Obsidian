@@ -25,4 +25,4 @@ if len(existing_files) > 0:
             zipf.write(file)
             print(f"Added {file} to {build_file}")
 
-    print("Zipping complete.")
+    print("Zipping complete")

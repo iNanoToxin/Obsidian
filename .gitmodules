@@ -1,0 +1,3 @@
+[submodule "Plugins/obsidian-execute-code"]
+	path = Plugins/obsidian-execute-code
+	url = https://github.com/twibiral/obsidian-execute-code.git
