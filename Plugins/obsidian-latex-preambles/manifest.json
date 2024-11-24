@@ -1,0 +1,10 @@
+{
+    "id": "obsidian-latex-preambles",
+    "name": "Latex Preambles",
+    "version": "1.0.0",
+    "minAppVersion": "0.15.0",
+    "description": "Allows you to add custom latex commands.",
+    "author": "iNanoToxin",
+    "authorUrl": "https://github.com/iNanoToxin",
+    "isDesktopOnly": false
+}

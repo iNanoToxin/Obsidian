@@ -1,3 +1,6 @@
 [submodule "Plugins/obsidian-execute-code"]
 	path = Plugins/obsidian-execute-code
 	url = https://github.com/twibiral/obsidian-execute-code.git
+[submodule "Plugins/obsidian-code-styler"]
+	path = Plugins/obsidian-code-styler
+	url = https://github.com/mayurankv/Obsidian-Code-Styler.git

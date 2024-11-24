@@ -8,7 +8,7 @@ assert os.path.isdir(sys.argv[1]), f'"{sys.argv[1]}" is not a valid directory'
 
 os.chdir(sys.argv[1])
 
-assert os.system("npm install") == 0, "failed to run `npm install`"
+assert os.system("npm install --legacy-peer-deps") == 0, "failed to run `npm install --legacy-peer-deps`"
 assert os.system("npm run build") == 0, "failed to run `npm run build`"
 
 
