@@ -1,49 +1,14 @@
-import { loadMathJax, App, Plugin, PluginManifest, PluginSettingTab, Setting, ListedFiles } from "obsidian";
+import { loadMathJax, App, Plugin, ListedFiles } from "obsidian";
 import { LatexExtensionSettings } from "src/ui/settings_tab";
 import { DEFAULT_SETTINGS, PluginSettings } from "src/settings/settings";
+
+declare global {
+    var MathJax: any;
+}
 
 export default class LatexExtension extends Plugin {
     app: App;
     settings: PluginSettings;
-
-    async loadPreambles() {
-        try {
-            const listedFiles = await this.app.vault.adapter.list(this.settings.folderPath);
-            const preambles: string[] = [];
-
-            if (!listedFiles) {
-                return;
-            }
-
-            // Use map to create an array of promises and await all at once
-            await Promise.all(
-                listedFiles.files
-                    .filter((filePath: string) => filePath.endsWith(".sty"))
-                    .map((filePath: string) =>
-                        this.app.vault.adapter.read(filePath).then((preamble: string) => {
-                            console.log(`Loaded preamble: ${filePath}`);
-                            preambles.push(preamble);
-                        })
-                    )
-            );
-
-            // @ts-expect-error Undocumented Obsidian API
-            let MathJax = window.MathJax;
-
-            if (MathJax.tex2chtml == undefined) {
-                // Ensure MathJax is ready before processing
-                MathJax.startup.ready = () => {
-                    MathJax.startup.defaultReady();
-                    preambles.forEach((preamble) => MathJax.tex2chtml(preamble));
-                };
-            } else {
-                // Process immediately if MathJax is already ready
-                preambles.forEach((preamble) => MathJax.tex2chtml(preamble));
-            }
-        } catch (error) {
-            console.error("Invalid preambles folder:", this.settings.folderPath);
-        }
-    }
 
     async onload() {
         await this.loadSettings();
@@ -51,18 +16,49 @@ export default class LatexExtension extends Plugin {
 
         this.addSettingTab(new LatexExtensionSettings(this.app, this));
 
-        // @ts-expect-error Undocumented Obsidian API
         if (!MathJax) {
             console.warn("MathJax was not defined despite loading it.");
             return;
         }
 
         await this.loadPreambles();
-        // TODO: Refresh view?
     }
 
-    onunload() {
-        // TODO: Is it possible to remove our definitions?
+    async loadPreambles() {
+        return this.getPreambles(this.settings.folderPath)
+            .then((preambles: string[]) => {
+                this.onMathJaxReady(() => preambles.forEach((preamble) => MathJax.tex2chtml(preamble)));
+            })
+            .catch(() => {
+                console.error("Invalid preambles folder:", this.settings.folderPath);
+            });
+    }
+
+    async getPreambles(path: string): Promise<string[]> {
+        return this.app.vault.adapter.list(path).then(async (listedFiles: ListedFiles) => {
+            const folderPreambles = await Promise.all(
+                listedFiles.folders.map(async (folderPath) => this.getPreambles(folderPath))
+            );
+
+            const filePreambles = await Promise.all(
+                listedFiles.files
+                    .filter((filePath) => filePath.endsWith(".sty"))
+                    .map(async (filePath) => this.app.vault.adapter.read(filePath))
+            );
+
+            return [...filePreambles, ...folderPreambles.flat()];
+        });
+    }
+
+    onMathJaxReady(callback: () => void) {
+        if (MathJax.tex2chtml == undefined) {
+            MathJax.startup.ready = () => {
+                MathJax.startup.defaultReady();
+                callback();
+            };
+        } else {
+            callback();
+        }
     }
 
     async loadSettings() {
