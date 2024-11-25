@@ -25,7 +25,7 @@ export class LatexExtensionSettings extends PluginSettingTab {
                     this.plugin.settings.folderPath = value;
                     await this.plugin.saveSettings();
                 });
-                new FolderSuggestion(this.plugin.app, text.inputEl, false, false);
+                new FolderSuggestion(this.plugin.app, text.inputEl, false, true);
             });
     }
 }
