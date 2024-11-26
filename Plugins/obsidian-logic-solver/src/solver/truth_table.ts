@@ -1,7 +1,7 @@
 import { App, Editor, Notice } from "obsidian";
-import { AstNode, BinaryOperation, UnaryOperation } from "../ast/ast_node";
-import { Parser } from "../ast/parser";
-import { InputModal } from "../ui/menu";
+import { AstNode, BinaryOperation, UnaryOperation } from "src/ast/ast_node";
+import { Parser } from "src/ast/parser";
+import { LogicSolverModal } from "src/ui/menu";
 
 type TruthValue = { [key: string]: number };
 type TruthTable = { [key: string]: number[] };
@@ -100,7 +100,7 @@ export function getTruthTable(app: App) {
     const editor: Editor | undefined = app.workspace.activeEditor?.editor;
 
     if (editor) {
-        new InputModal(app, (input: string) => {
+        new LogicSolverModal(app, (input: string) => {
             const truthTable = generateTruthTable(input);
 
             if (truthTable) {

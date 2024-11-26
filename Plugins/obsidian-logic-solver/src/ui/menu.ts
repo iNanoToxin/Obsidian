@@ -1,5 +1,5 @@
 import { App, ButtonComponent, Editor, Menu, MenuItem, Modal, Setting, TextComponent } from "obsidian";
-import { copyTruthTable, getTruthTable } from "../solver/truth_table";
+import { copyTruthTable, getTruthTable } from "src/solver/truth_table";
 
 export interface DetailedMenu extends Menu {
     items: DetailedMenu[];
@@ -7,7 +7,7 @@ export interface DetailedMenu extends Menu {
     submenu: DetailedMenu;
 }
 
-export class InputModal extends Modal {
+export class LogicSolverModal extends Modal {
     input: string;
     callback: (input: string) => void;
 
@@ -18,28 +18,25 @@ export class InputModal extends Modal {
     }
 
     onOpen() {
-        const { contentEl } = this;
-        contentEl.createEl("h2", {
-            text: "Enter logical expression",
-        });
+        this.setTitle("Truth Table Generator");
 
-        new Setting(contentEl)
+        new Setting(this.contentEl)
             .setName("Logical expression")
             .setDesc("Enter latex expression")
             .addText((text: TextComponent) => {
-                text.setPlaceholder("Expression")
-                    .onChange((value) => {
-                        this.input = value;
-                    })
-                    .inputEl.addEventListener("keydown", (event: KeyboardEvent) => {
-                        if (event.key === "Enter") {
-                            this.close();
-                            this.callback(this.input);
-                        }
-                    });
+                text.setPlaceholder("Expression").onChange((value) => {
+                    this.input = value;
+                });
+
+                text.inputEl.addEventListener("keydown", (event: KeyboardEvent) => {
+                    if (event.key === "Enter") {
+                        this.close();
+                        this.callback(this.input);
+                    }
+                });
             });
 
-        new Setting(contentEl).addButton((button: ButtonComponent) => {
+        new Setting(this.contentEl).addButton((button: ButtonComponent) => {
             button
                 .setButtonText("Submit")
                 .setCta()
@@ -51,12 +48,11 @@ export class InputModal extends Modal {
     }
 
     onClose() {
-        const { contentEl } = this;
-        contentEl.empty();
+        this.contentEl.empty();
     }
 }
 
-export function contextMenu(app: App, menu: DetailedMenu, editor: Editor): void {
+export function LogicSolverContextMenu(app: App, menu: DetailedMenu, editor: Editor): void {
     const selectionMenu: DetailedMenu | undefined = Object.values(menu.items)
         .filter((category: DetailedMenu) => category.section == "selection")
         .find((category: DetailedMenu) =>

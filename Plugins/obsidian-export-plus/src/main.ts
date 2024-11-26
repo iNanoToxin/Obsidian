@@ -1,10 +1,11 @@
-import { ItemView, Plugin } from "obsidian";
+import { ItemView, Menu, Plugin, TAbstractFile, TFile } from "obsidian";
 import { CaptureInputModal } from "./ui/capture_input";
 import { CanvasOverlay } from "./ui/canvas_overlay";
 import { DEFAULT_SETTINGS, ExportPlusSettings } from "./settings/settings";
 import { ExportSettings } from "./ui/export_settings";
 import { OverlayStatusBar } from "./ui/overlay_status_bar";
 import { ThemeStatusBar } from "./ui/theme_status_bar";
+import { PackCanvasModal } from "./ui/pack_canvas_modal";
 
 export default class ExportPlus extends Plugin {
     settings: ExportPlusSettings;
@@ -49,6 +50,34 @@ export default class ExportPlus extends Plugin {
 
         this.app.workspace.on("layout-change", () => this.updateOverlays(this.settings.overlayEnabled));
         this.updateOverlays(this.settings.overlayEnabled);
+
+        this.addCommand({
+            id: "pack-canvas",
+            name: "Pack Canvas",
+            checkCallback: (checking: boolean) => {
+                const view: any = this.app.workspace.getActiveViewOfType(ItemView);
+
+                if (view && view.canvas) {
+                    if (!checking) {
+                        new PackCanvasModal(this, view.file).open();
+                    }
+                    return true;
+                }
+                return false;
+            },
+        });
+
+        this.registerEvent(
+            this.app.workspace.on("file-menu", (menu: Menu, file: TAbstractFile) => {
+                if ((file as TFile).extension !== "canvas") return;
+
+                menu.addItem((item) => {
+                    item.setTitle("Pack Canvas")
+                        .setIcon("group")
+                        .onClick(() => new PackCanvasModal(this, file as TFile).open());
+                });
+            })
+        );
 
         this.overlayStatusBar = new OverlayStatusBar(this);
         this.themeStatusBar = new ThemeStatusBar(this);

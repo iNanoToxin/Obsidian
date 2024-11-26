@@ -20,26 +20,31 @@ export class CanvasOverlay {
     }
 
     render() {
-        const captureInfo = new CaptureInfo(this.canvas);
-        captureInfo.setZoom(this.canvas.zoom);
-
-        const { paperWidth, paperHeight, overlayColor, overlayTransparency } = this.plugin.settings;
-        const { boundingBox } = captureInfo;
-        const lenX = boundingBox.max.x - boundingBox.min.x;
-        const lenY = boundingBox.max.y - boundingBox.min.y;
-        const paperRatio = paperWidth / paperHeight;
-
-        this.overlay.style.backgroundColor = overlayColor;
-        this.overlay.style.opacity = overlayTransparency.toString();
-
-        if (lenX > lenY) {
-            this.overlay.style.width = `${Math.max(lenY / paperRatio, lenX)}px`;
-            this.overlay.style.height = `${Math.max(lenY, lenX * paperRatio)}px`;
+        if (this.canvas.nodes.size == 0) {
+            this.overlay.style.display = "none";
         } else {
-            this.overlay.style.width = `${Math.max(lenX, lenY * paperRatio)}px`;
-            this.overlay.style.height = `${Math.max(lenX / paperRatio, lenY)}px`;
+            const captureInfo = new CaptureInfo(this.canvas);
+            captureInfo.setZoom(this.canvas.zoom);
+
+            const { paperWidth, paperHeight, overlayColor, overlayTransparency } = this.plugin.settings;
+            const { boundingBox } = captureInfo;
+            const lenX = boundingBox.max.x - boundingBox.min.x;
+            const lenY = boundingBox.max.y - boundingBox.min.y;
+            const paperRatio = paperWidth / paperHeight;
+
+            this.overlay.style.backgroundColor = overlayColor;
+            this.overlay.style.opacity = overlayTransparency.toString();
+            this.overlay.style.display = "block";
+
+            if (lenX > lenY) {
+                this.overlay.style.width = `${Math.max(lenY / paperRatio, lenX)}px`;
+                this.overlay.style.height = `${Math.max(lenY, lenX * paperRatio)}px`;
+            } else {
+                this.overlay.style.width = `${Math.max(lenX, lenY * paperRatio)}px`;
+                this.overlay.style.height = `${Math.max(lenX / paperRatio, lenY)}px`;
+            }
+            this.overlay.style.transform = `translate(${boundingBox.min.x}px, ${boundingBox.min.y}px)`;
         }
-        this.overlay.style.transform = `translate(${boundingBox.min.x}px, ${boundingBox.min.y}px)`;
 
         this.frame = requestAnimationFrame(() => this.render());
     }

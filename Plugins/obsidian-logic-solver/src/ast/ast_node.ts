@@ -1,4 +1,4 @@
-import { getPrecedence, toLatexString, TokenType } from "./token";
+import { getPrecedence, toLatexString, TokenType } from "src/ast/token";
 
 export class AstBase {
     type: TokenType;

@@ -1,5 +1,5 @@
-import { getPrecedence, LatexOperatorLookup, Token, TokenType } from "./token";
-import { AstNode, BinaryOperation, Identifer, UnaryOperation } from "./ast_node";
+import { getPrecedence, LatexOperatorLookup, Token, TokenType } from "src/ast/token";
+import { AstNode, BinaryOperation, Identifer, UnaryOperation } from "src/ast/ast_node";
 
 export class Parser {
     tokens: Token[] = [];

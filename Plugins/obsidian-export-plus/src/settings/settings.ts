@@ -12,6 +12,8 @@ export interface ExportPlusSettings {
     fileSaveOption: string;
     fileSavePath: string;
     themeBlackAndWhite: boolean;
+    packedFolderPath: string;
+    packedVertical: boolean;
 }
 
 export const ATTACHMENT_LOCATION_OPTIONS: Record<string, string> = {
@@ -34,4 +36,6 @@ export const DEFAULT_SETTINGS: ExportPlusSettings = {
 
     fileSaveOption: "root",
     fileSavePath: "/",
+    packedFolderPath: "/",
+    packedVertical: true,
 };

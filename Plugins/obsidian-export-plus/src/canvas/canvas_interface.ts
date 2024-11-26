@@ -3,6 +3,7 @@ export interface CanvasNode {
     y: number;
     width: number;
     height: number;
+    type: string;
 }
 
 export interface CanvasRect {
@@ -41,4 +42,9 @@ export interface Canvas {
     select: () => void;
     selectOnly: () => void;
     selectAll: () => void;
+}
+
+export interface CanvasJson {
+    nodes: CanvasNode[];
+    edges: any[];
 }
