@@ -2,8 +2,6 @@ from util.npm import clean, get_folders
 import argparse
 import os
 
-os.chdir("C:\\Users\\Dylan\\Documents\\Repos\\Obsidian")
-
 parser = argparse.ArgumentParser(add_help=True)
 parser.add_argument(
     "--path",
