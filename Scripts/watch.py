@@ -1,8 +1,9 @@
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler, FileModifiedEvent
-import shutil
+from util.npm import get_package, start_watch, copied_text, modified_text, NPM_INSTALL
+from util.color import color
+import subprocess
 import os
 import sys
+
 
 assert len(sys.argv) > 2, "source and destination path arguments required"
 source_path = sys.argv[1]
@@ -11,40 +12,40 @@ dest_path = sys.argv[2]
 assert os.path.isdir(source_path), f'"{source_path}" is not a valid directory'
 assert os.path.isdir(dest_path), f'"{dest_path}" is not a valid directory'
 
-os.chdir(source_path)
 
-assert os.system("npm install --legacy-peer-deps") == 0, "failed to run `npm install --legacy-peer-deps`"
+print(color("Installing npm dependencies...", 63))
 
-def color(string: str, color: int):
-    return f"\033[38;5;{color}m{string}\033[0m"
+process = subprocess.Popen(
+    f"cd {source_path} && {NPM_INSTALL}",
+    shell=True,
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL,
+)
+process.wait()
 
-files_to_copy = ["main.js", "styles.css", "manifest.json", "data.json"]
-
-
-for file in files_to_copy:
-    if os.path.isfile(file):
-        shutil.copy(file, dest_path)
-        print(f"{color("Copied", 1)} {color(file, 67)} -> {color(os.path.basename(dest_path), 173)}")
+print(color("Finished installing npm dependencies", 63))
 
 
-class FileWatcher(FileSystemEventHandler):
-    def on_modified(self, event: FileModifiedEvent):
-        file = os.path.basename(event.src_path)
+message_queue = []
 
-        if file in files_to_copy:
-            print(f"{color("Modified", 132)} {color(file, 67)} -> {color(os.path.basename(dest_path), 173)}")
-            shutil.copy(event.src_path, dest_path)
+subprocess.Popen(
+    f'cd "{source_path}" && {get_package(source_path)["scripts"]["dev"]}',
+    shell=True,
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL,
+)
 
+start_watch(
+    source_path,
+    dest_path,
+    on_copied=lambda src, dest: message_queue.append(copied_text(src, dest)),
+    on_modified=lambda src, dest: message_queue.append(modified_text(src, dest)),
+)
 
-event_handler = FileWatcher()
-observer = Observer()
-observer.schedule(event_handler, source_path, event_filter=[FileModifiedEvent])
-observer.start()
 
 try:
-    assert os.system("npm run dev") == 0, "failed to run `npm run dev`"
+    while True:
+        if message_queue:
+            print(message_queue.pop(0))
 except KeyboardInterrupt:
-    pass
-
-observer.stop()
-observer.join()
+    print(color("Watch aborted", 16))

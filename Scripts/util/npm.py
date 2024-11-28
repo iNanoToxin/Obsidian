@@ -1,6 +1,6 @@
 from watchdog.events import FileSystemEventHandler, FileModifiedEvent
 from watchdog.observers import Observer, ObserverType
-from typing import List, Dict, Callable, Optional, Literal
+from typing import List, Dict, Callable, Optional
 from semver import VersionInfo
 from util.color import color
 import shutil
@@ -11,7 +11,7 @@ import filecmp
 
 NPM_DEPS = ["dependencies", "devDependencies", "peerDependencies"]
 NPM_INSTALL = "npm install --force"
-MAIN_FILES = ["main.js", "styles.css", "data.json", "manifest.json"]
+FILES_TO_WATCH = ["main.js", "styles.css", "data.json", "manifest.json"]
 FILES_TO_DELETE = ["main.js", "styles.css", "data.json", "package-lock.json"]
 
 
@@ -31,7 +31,7 @@ class FileCopier(FileSystemEventHandler):
         file = os.path.basename(event.src_path)
         dest = os.path.join(self.dest_path, file)
 
-        if file in MAIN_FILES:
+        if file in FILES_TO_WATCH:
             if not os.path.isfile(dest) or not filecmp.cmp(event.src_path, dest):
                 shutil.copy(event.src_path, self.dest_path)
 
@@ -47,19 +47,17 @@ def get_folders(path: str) -> List[str]:
     ]
 
 
+def get_package(path: str) -> Dict:
+    package_path = os.path.join(path, "package.json")
+
+    assert os.path.exists(package_path), f"package.json required in {color(path, 2)}"
+
+    with open(package_path, "r") as file:
+        return json.loads(file.read())
+
+
 def get_packages(path: str) -> Dict[str, Dict]:
-    package_map = {}
-
-    for folder in get_folders(path):
-        package_path = os.path.join(folder, "package.json")
-        assert os.path.exists(
-            package_path
-        ), f"package.json required in {color(folder, 2)}"
-
-        with open(package_path, "r") as file:
-            package_map[folder] = json.loads(file.read())
-
-    return package_map
+    return {folder: get_package(folder) for folder in get_folders(path)}
 
 
 def combine_dependencies(*packages, func=max) -> Dict:
@@ -108,7 +106,7 @@ def start_watch(
     on_copied: Optional[Callable[[str, str], None]] = None,
     on_modified: Optional[Callable[[str, str], None]] = None,
 ) -> ObserverType:
-    for file in MAIN_FILES:
+    for file in FILES_TO_WATCH:
         src = os.path.join(path, file)
         dest = os.path.join(dest_path, file)
 

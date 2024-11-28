@@ -1,25 +1,9 @@
 from util.npm import clean, get_folders
-import argparse
+from util.plugin import get_args
 import os
 
-parser = argparse.ArgumentParser(add_help=True)
-parser.add_argument(
-    "--path",
-    type=str,
-    help="Path to folder with obsidian plugins",
-    default=os.path.abspath("./Plugins"),
-    required=False,
-)
-parser.add_argument(
-    "--root",
-    type=str,
-    help="Path to root folder where node_modules will be installed",
-    default=os.path.abspath("."),
-    required=False,
-)
 
-
-args = parser.parse_args()
+args = get_args(path=True, root=True)
 
 assert os.path.isdir(args.path), f'"{args.path}" is not a valid directory'
 assert os.path.isdir(args.root), f'"{args.root}" is not a valid directory'

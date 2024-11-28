@@ -1,3 +1,4 @@
+from util.plugin import get_args
 from util.color import color
 from util.npm import (
     get_packages,
@@ -8,35 +9,11 @@ from util.npm import (
     modified_text,
 )
 import subprocess
-import argparse
 import os
 import json
 
 
-parser = argparse.ArgumentParser(add_help=True)
-parser.add_argument(
-    "--path",
-    type=str,
-    help="Path to folder with obsidian plugins",
-    default=os.path.abspath("./Plugins"),
-    required=False,
-)
-parser.add_argument(
-    "--vault",
-    type=str,
-    help="Path to obsidian vault",
-    required=True,
-)
-parser.add_argument(
-    "--root",
-    type=str,
-    help="Path to root folder where node_modules will be installed",
-    default=os.path.abspath("."),
-    required=False,
-)
-
-
-args = parser.parse_args()
+args = get_args(path=True, root=True, vault=True)
 plugins_path = os.path.join(args.vault, ".obsidian/plugins")
 
 
@@ -87,11 +64,9 @@ for folder, package in packages.items():
     )
 
 
-while True:
-    try:
-        while True:
-            if message_queue:
-                print(message_queue.pop(0))
-    except KeyboardInterrupt:
-        if input("Abort watch? (Y/N): ").strip().lower() == "y":
-            break
+try:
+    while True:
+        if message_queue:
+            print(message_queue.pop(0))
+except KeyboardInterrupt:
+    print(color("Watch aborted", 16))
