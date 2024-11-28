@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
-import { FolderSuggestion } from "src/util/folder_suggestion";
+import { FolderSuggest } from "common/folder_suggest";
 import LatexExtension from "src/main";
 
 export class LatexExtensionSettings extends PluginSettingTab {
@@ -21,11 +21,13 @@ export class LatexExtensionSettings extends PluginSettingTab {
                 if (this.plugin.settings.folderPath.length > 0) {
                     text.setValue(this.plugin.settings.folderPath);
                 }
+
                 text.setPlaceholder("Example: notes/preambles").onChange(async (value: string) => {
                     this.plugin.settings.folderPath = value;
                     await this.plugin.saveSettings();
                 });
-                new FolderSuggestion(this.plugin.app, text.inputEl, false, true);
+
+                new FolderSuggest(this.plugin.app, text.inputEl);
             });
     }
 }

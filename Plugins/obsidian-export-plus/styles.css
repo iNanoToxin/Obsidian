@@ -1,6 +1,8 @@
+/* src/styles.css */
 .export-plus-overlay {
-    position: fixed;
-    z-index: 10000000;
-    border-radius: var(--radius-m);
-    pointer-events: none;
+  position: fixed;
+  z-index: 10000000;
+  border-radius: var(--radius-m);
+  pointer-events: none;
 }
+/*# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsic3JjL3N0eWxlcy5jc3MiXSwKICAic291cmNlc0NvbnRlbnQiOiBbIi5leHBvcnQtcGx1cy1vdmVybGF5IHtcbiAgICBwb3NpdGlvbjogZml4ZWQ7XG4gICAgei1pbmRleDogMTAwMDAwMDA7XG4gICAgYm9yZGVyLXJhZGl1czogdmFyKC0tcmFkaXVzLW0pO1xuICAgIHBvaW50ZXItZXZlbnRzOiBub25lO1xufVxuIl0sCiAgIm1hcHBpbmdzIjogIjtBQUFBLENBQUM7QUFDRyxZQUFVO0FBQ1YsV0FBUztBQUNULGlCQUFlLElBQUk7QUFDbkIsa0JBQWdCO0FBQ3BCOyIsCiAgIm5hbWVzIjogW10KfQo= */

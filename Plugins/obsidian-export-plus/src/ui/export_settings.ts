@@ -9,8 +9,8 @@ import {
     ToggleComponent,
 } from "obsidian";
 import { ATTACHMENT_LOCATION_OPTIONS, DEFAULT_SETTINGS } from "src/settings/settings";
+import { FolderSuggest } from "common/folder_suggest";
 import ExportPlus from "src/main";
-import { FolderSuggestion } from "src/util/folder_suggestion";
 
 export class ExportSettings extends PluginSettingTab {
     private plugin: ExportPlus;
@@ -157,7 +157,7 @@ export class ExportSettings extends PluginSettingTab {
                     this.plugin.settings.fileSavePath = this.getSavePath();
                     await this.plugin.saveSettings();
                 });
-                new FolderSuggestion(this.plugin.app, text.inputEl, false, false);
+                new FolderSuggest(this.plugin.app, text.inputEl);
                 this.folderText = text;
             });
 

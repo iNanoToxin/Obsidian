@@ -1,8 +1,9 @@
 import { ButtonComponent, Modal, Notice, SearchComponent, Setting, TFile, ToggleComponent } from "obsidian";
 import { CanvasJson, CanvasNode } from "src/canvas/canvas_interface";
 import ExportPlus from "src/main";
-import { FolderSuggestion } from "src/util/folder_suggestion";
 import { Rect, binarySearchPack, calculatePackingDimensions } from "src/util/packer";
+
+import { FolderSuggest } from "common/folder_suggest"
 
 let NOTICE_DURATION = 7 * 1000;
 
@@ -94,7 +95,7 @@ export class PackCanvasModal extends Modal {
                 text.setDisabled(true);
                 setTimeout(() => text.setDisabled(false), 10);
 
-                new FolderSuggestion(this.app, text.inputEl, false, true);
+                new FolderSuggest(this.app, text.inputEl).allowRoot(true);
             });
 
         new Setting(this.contentEl)
