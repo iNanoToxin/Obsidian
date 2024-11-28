@@ -1,4 +1,30 @@
-node_modules/
-__pycache__/
-.vscode/
+# python
+__pycache__
+
+# vscode
+.vscode
+
+# Intellij
+*.iml
+.idea
+
+# npm
+node_modules
 package-lock.json
+
+# Don't include the compiled main.js file in the repo.
+# They should be uploaded to GitHub releases instead.
+Plugins/*/main.js
+Plugins/*/styles.css
+
+# obsidian
+Plugins/*/data.json
+
+# Exclude macOS Finder (System Explorer) View States
+.DS_Store
+*.log
+
+# Exclude sourcemaps
+*.map
+
+/package.json

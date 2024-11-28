@@ -8,9 +8,11 @@ import json
 import os
 import filecmp
 
+
 NPM_DEPS = ["dependencies", "devDependencies", "peerDependencies"]
 NPM_INSTALL = "npm install --force"
-MAIN_FILES = ["main.js", "styles.css", "manifest.json", "data.json"]
+MAIN_FILES = ["main.js", "styles.css", "data.json", "manifest.json"]
+FILES_TO_DELETE = ["main.js", "styles.css", "data.json", "package-lock.json"]
 
 
 class FileCopier(FileSystemEventHandler):
@@ -129,3 +131,18 @@ def copied_text(file_path: str, dest: str) -> str:
 
 def modified_text(file_path: str, dest: str) -> str:
     return f"[{color(os.path.basename(dest), 173)}] {color("modified", 132)} {color(os.path.basename(file_path), 67)}"
+
+
+def clean(plugin_path: str):
+    for file in FILES_TO_DELETE:
+        if os.path.isfile(file_path := os.path.join(plugin_path, file)):
+            os.remove(file_path)
+
+    zip_file = os.path.join(plugin_path, f"{os.path.basename(plugin_path)}.zip")
+    node_modules = os.path.join(plugin_path, "node_modules")
+
+    if os.path.isfile(zip_file):
+        os.remove(zip_file)
+
+    if os.path.isdir(node_modules):
+        os.system(f'rd /s /q "{node_modules}"')
