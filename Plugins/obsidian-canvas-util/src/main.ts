@@ -1,5 +1,5 @@
 import { Plugin, setIcon, setTooltip } from "obsidian";
-import { BBox, Canvas, CanvasNode } from "./interfaces/canvas";
+import { BBox, Canvas, CanvasNode } from "common/interface/canvas";
 
 const SPACING = 20;
 const SNAP_GRID = (n: number) => Math.ceil(n / SPACING) * SPACING;

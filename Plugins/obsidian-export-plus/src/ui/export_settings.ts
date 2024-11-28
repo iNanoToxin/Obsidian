@@ -3,13 +3,14 @@ import {
     DropdownComponent,
     HexString,
     PluginSettingTab,
+    SearchComponent,
     Setting,
     SliderComponent,
     TextComponent,
     ToggleComponent,
 } from "obsidian";
 import { ATTACHMENT_LOCATION_OPTIONS, DEFAULT_SETTINGS } from "src/settings/settings";
-import { FolderSuggest } from "common/folder_suggest";
+import { FolderSuggest } from "common/file/folder_suggest";
 import ExportPlus from "src/main";
 
 export class ExportSettings extends PluginSettingTab {
@@ -62,7 +63,7 @@ export class ExportSettings extends PluginSettingTab {
                 text
                     .setPlaceholder(DEFAULT_SETTINGS.paperWidth.toString())
                     .setValue(this.plugin.settings.paperWidth.toString())
-                    .onChange(async (value) => {
+                    .onChange(async (value: string) => {
                         let number = parseFloat(value);
                         if (!isNaN(number)) {
                             this.plugin.settings.paperWidth = number;
@@ -76,35 +77,34 @@ export class ExportSettings extends PluginSettingTab {
             .setDesc(
                 "Set the height of the paper in units (e.g., pixels, inches). This will affect how overlay is laid out on the canvas."
             )
-            .addText((text: TextComponent) =>
-                text
-                    .setPlaceholder(DEFAULT_SETTINGS.paperHeight.toString())
+            .addText((text: TextComponent) => {
+                text.setPlaceholder(DEFAULT_SETTINGS.paperHeight.toString())
                     .setValue(this.plugin.settings.paperHeight.toString())
-                    .onChange(async (value) => {
+                    .onChange(async (value: string) => {
                         let number = parseFloat(value);
                         if (!isNaN(number)) {
                             this.plugin.settings.paperHeight = number;
                             await this.plugin.saveSettings();
                         }
-                    })
-            );
+                    });
+            });
 
         new Setting(this.containerEl)
             .setName("Overlay Color")
             .setDesc("Set the color of your paper overlay.")
-            .addColorPicker((colorPicker: ColorComponent) =>
+            .addColorPicker((colorPicker: ColorComponent) => {
                 colorPicker
                     .onChange(async (hex: HexString) => {
                         this.plugin.settings.overlayColor = hex;
                         await this.plugin.saveSettings();
                     })
-                    .setValue(this.plugin.settings.overlayColor)
-            );
+                    .setValue(this.plugin.settings.overlayColor);
+            });
 
         new Setting(this.containerEl)
             .setName("Overlay Transparency")
             .setDesc("Set the transparency of your paper overlay.")
-            .addSlider((slider: SliderComponent) =>
+            .addSlider((slider: SliderComponent) => {
                 slider
                     .setLimits(0, 1, "any")
                     .setInstant(true)
@@ -113,21 +113,21 @@ export class ExportSettings extends PluginSettingTab {
                         this.plugin.settings.overlayTransparency = value;
                         await this.plugin.saveSettings();
                     })
-                    .setValue(this.plugin.settings.overlayTransparency)
-            );
+                    .setValue(this.plugin.settings.overlayTransparency);
+            });
 
         new Setting(this.containerEl)
             .setName("Printer Theme")
             .setDesc("Always display theme in black and white.")
-            .addToggle((toggle: ToggleComponent) =>
+            .addToggle((toggle: ToggleComponent) => {
                 toggle
                     .onChange(async (value: boolean) => {
                         this.plugin.settings.themeBlackAndWhite = value;
                         this.plugin.themeStatusBar.setPrintTheme(this.plugin.themeStatusBar.enabled);
                         await this.plugin.saveSettings();
                     })
-                    .setValue(this.plugin.settings.themeBlackAndWhite)
-            );
+                    .setValue(this.plugin.settings.themeBlackAndWhite);
+            });
 
         this.containerEl.createEl("h1", { text: "Files" });
 
@@ -149,16 +149,15 @@ export class ExportSettings extends PluginSettingTab {
 
         this.folderSetting = new Setting(this.containerEl)
             .setName("Attachment folder path")
-            .setDesc(
-                "Place newly created attachment files, such as images created via drag-and-drop or audio recordings, in this folder."
-            )
-            .addText((text) => {
-                text.setPlaceholder("Example: folder_a/folder_b").onChange(async () => {
+            .setDesc("Place exported files in this folder.")
+            .addSearch((search: SearchComponent) => {
+                search.setPlaceholder("Example: notes/exported").onChange(async () => {
                     this.plugin.settings.fileSavePath = this.getSavePath();
                     await this.plugin.saveSettings();
                 });
-                new FolderSuggest(this.plugin.app, text.inputEl);
-                this.folderText = text;
+
+                new FolderSuggest(this.plugin.app, search.inputEl);
+                this.folderText = search;
             });
 
         this.subfolderSetting = new Setting(this.containerEl)
@@ -166,7 +165,7 @@ export class ExportSettings extends PluginSettingTab {
             .setDesc(
                 'If your file is under "vault/folder", and you set subfolder name to "attachments", attachments will be saved to "vault/folder/attachments".'
             )
-            .addText((text) => {
+            .addText((text: TextComponent) => {
                 text.setPlaceholder("attachments").onChange(async () => {
                     this.plugin.settings.fileSavePath = this.getSavePath();
                     await this.plugin.saveSettings();

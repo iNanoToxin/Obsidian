@@ -20,7 +20,7 @@
         "paths": {
             "common/*": [
                 "../../Common/*"
-            ] // Create the alias
+            ]
         }
     },
     "include": [

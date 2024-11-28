@@ -1,4 +1,4 @@
-import { Canvas, CanvasNode } from "./canvas_interface";
+import { Canvas, CanvasNode } from "common/interface/canvas";
 
 const MAX_CANVAS_SIZE = 16384;
 

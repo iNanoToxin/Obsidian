@@ -1,6 +1,6 @@
 import { ButtonComponent, Modal, Setting, SliderComponent, ToggleComponent } from "obsidian";
 import { CanvasCapture } from "../canvas/canvas_capture";
-import { Canvas } from "../canvas/canvas_interface";
+import { Canvas } from "common/interface/canvas";
 import { CaptureInfo } from "../canvas/canvas_info";
 import ExportPlus from "src/main";
 

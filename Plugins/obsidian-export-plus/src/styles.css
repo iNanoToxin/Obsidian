@@ -1,6 +1,118 @@
+:root {
+    --separation-space: 4px;
+    --separation-list: 2em;
+}
+
+/* canvas overlay css */
 .export-plus-overlay {
     position: fixed;
     z-index: 10000000;
     border-radius: var(--radius-m);
     pointer-events: none;
+}
+
+/* make all text on canvas black */
+.printer-mode.theme-light div.canvas * {
+    color: #000000 !important;
+}
+
+/* lists */
+.printer-mode .markdown-rendered ul > li,
+.printer-mode .markdown-rendered ol > li {
+    margin-inline-start: var(--separation-list);
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+}
+
+/* canvas card padding left */
+.printer-mode .canvas-node-content.markdown-embed > .markdown-embed-content > .markdown-preview-view {
+    padding: 0px var(--separation-space) !important;
+}
+
+/* canvas card padding top and bottom */
+.printer-mode .canvas-node-content.markdown-embed > .markdown-embed-content > .markdown-preview-view::before,
+.printer-mode .canvas-node-content.markdown-embed > .markdown-embed-content > .markdown-preview-view::after {
+    min-height: var(--separation-space) !important;
+    max-height: var(--separation-space) !important;
+}
+
+/* canvas card padding right extend */
+.printer-mode .markdown-preview-view {
+    overflow-y: initial !important;
+    /* line-height: 16px !important; */
+}
+
+/* callout padding */
+.printer-mode .callout {
+    margin: 0px 0px var(--separation-space) 0px !important;
+    padding: var(--separation-space) var(--separation-space) var(--separation-space) var(--separation-space) !important;
+}
+
+/* text, list, separator padding */
+.printer-mode p,
+.printer-mode ul,
+.printer-mode h1,
+.printer-mode h2,
+.printer-mode h3,
+.printer-mode h4,
+.printer-mode h5,
+.printer-mode h6,
+.printer-mode hr {
+    margin-block-start: var(--separation-space) !important;
+    margin-block-end: var(--separation-space) !important;
+}
+
+/* canvas card header padding */
+.printer-mode .inline-title {
+    margin-bottom: 0px !important;
+}
+
+/* table cell padding */
+.printer-mode .cm-html-embed td,
+.printer-mode .markdown-rendered td,
+.printer-mode .cm-html-embed th,
+.printer-mode .markdown-rendered th {
+    padding: 0px 0px !important;
+    padding: 0px var(--separation-space) !important;
+}
+
+/* negation add extra padding */
+.printer-mode mjx-c.mjx-cAC {
+    padding-right: 2px;
+}
+
+/* canvas card border */
+.printer-mode.theme-light .canvas-node-container {
+    /* border-radius: 0px; */
+    border: 2px solid #000000;
+}
+
+/* canvas card label */
+.printer-mode .canvas-node-label {
+    display: none;
+}
+
+/* color customization for light mode */
+.printer-mode.theme-light {
+    --table-border-color: #000000;
+    --table-border-width: 2px;
+    --list-marker-color: #000000;
+    --callout-title-color: #000000;
+    --callout-border-width: 2px;
+
+    --canvas-color: 0 0 0;
+
+    --callout-bug: #000000;
+    --callout-default: #000000;
+    --callout-error: #000000;
+    --callout-example: #000000;
+    --callout-fail: #000000;
+    --callout-important: #000000;
+    --callout-info: #000000;
+    --callout-question: #000000;
+    --callout-success: #000000;
+    --callout-summary: #000000;
+    --callout-tip: #000000;
+    --callout-todo: #000000;
+    --callout-warning: #000000;
 }

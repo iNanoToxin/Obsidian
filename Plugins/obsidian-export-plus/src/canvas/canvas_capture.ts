@@ -1,9 +1,9 @@
-import { App, Notice, TAbstractFile, TFile } from "obsidian";
-import { Canvas } from "./canvas_interface";
+import { Notice } from "obsidian";
 import { PropertyManager } from "../util/property_manager";
 import { CaptureInfo } from "./canvas_info";
-import ExportPlus from "src/main";
 import { ProgressBarPopup } from "src/ui/progress_bar_popup";
+import { Canvas } from "common/interface/canvas";
+import ExportPlus from "src/main";
 
 export class CanvasCapture {
     private canvas: Canvas;

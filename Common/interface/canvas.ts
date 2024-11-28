@@ -5,6 +5,15 @@ export interface BBox {
     maxY: number;
 }
 
+export interface CanvasRect {
+    left: number;
+    top: number;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
 export interface CanvasNode {
     x: number;
     y: number;

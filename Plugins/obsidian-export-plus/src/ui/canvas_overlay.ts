@@ -1,4 +1,4 @@
-import { Canvas } from "src/canvas/canvas_interface";
+import { Canvas } from "common/interface/canvas";
 import { CaptureInfo } from "src/canvas/canvas_info";
 import ExportPlus from "src/main";
 

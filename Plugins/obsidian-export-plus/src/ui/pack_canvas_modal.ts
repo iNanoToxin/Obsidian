@@ -1,9 +1,9 @@
 import { ButtonComponent, Modal, Notice, SearchComponent, Setting, TFile, ToggleComponent } from "obsidian";
-import { CanvasJson, CanvasNode } from "src/canvas/canvas_interface";
-import ExportPlus from "src/main";
 import { Rect, binarySearchPack, calculatePackingDimensions } from "src/util/packer";
+import { JsonCanvas, JsonNode } from "common/interface/canvas_json";
+import { FolderSuggest } from "common/file/folder_suggest"
+import ExportPlus from "src/main";
 
-import { FolderSuggest } from "common/folder_suggest"
 
 let NOTICE_DURATION = 7 * 1000;
 
@@ -32,12 +32,12 @@ export class PackCanvasModal extends Modal {
                 return this.app.vault.read(this.file);
             })
             .then((content: string) => JSON.parse(content))
-            .then((data: CanvasJson) => {
-                let map = new Map<Rect, CanvasNode>();
+            .then((data: JsonCanvas) => {
+                let map = new Map<Rect, JsonNode>();
 
                 data.nodes
-                    .filter((node: CanvasNode) => node.type === "file" || node.type === "text")
-                    .forEach((node: CanvasNode) => {
+                    .filter((node: JsonNode) => node.type === "file" || node.type === "text")
+                    .forEach((node: JsonNode) => {
                         map.set(new Rect(node.width, node.height), node);
                     });
 
@@ -48,7 +48,7 @@ export class PackCanvasModal extends Modal {
                 binarySearchPack(Array.from(map.keys()), ratio, packedVertical);
                 return map;
             })
-            .then((map: Map<Rect, CanvasNode>) => {
+            .then((map: Map<Rect, JsonNode>) => {
                 for (const [rect, node] of map) {
                     node.x = rect.x;
                     node.y = rect.y;
