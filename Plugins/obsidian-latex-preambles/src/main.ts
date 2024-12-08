@@ -27,7 +27,12 @@ export default class LatexExtension extends Plugin {
     async loadPreambles() {
         return this.getPreambles(this.settings.folderPath)
             .then((preambles: string[]) => {
-                this.onMathJaxReady(() => preambles.forEach((preamble) => MathJax.tex2chtml(preamble)));
+                this.onMathJaxReady(() => {
+                    // Wraps all commands with braces to protect them
+                    MathJax.tex2chtml(`\\newcommand{\\newsafecommand}[3]{\\newcommand{#1}[#2]{{ #3 }}}`);
+
+                    preambles.forEach((preamble) => MathJax.tex2chtml(preamble));
+                });
             })
             .catch(() => {
                 console.error("Invalid preambles folder:", this.settings.folderPath);
