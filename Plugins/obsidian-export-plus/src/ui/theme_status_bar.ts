@@ -6,11 +6,17 @@ export class ThemeStatusBar {
     plugin: ExportPlus;
     enabled: boolean;
 
+    lastCssTheme: string;
+    lastTheme: string;
+
     constructor(plugin: ExportPlus) {
         let app: any = plugin.app;
 
         this.plugin = plugin;
         this.enabled = false;
+
+        this.lastCssTheme = "Default";
+        this.lastTheme = "obsidian";
 
         this.statusBarItemEl = plugin.addStatusBarItem();
         this.statusBarItemEl.addClass("mod-clickable");
@@ -38,28 +44,24 @@ export class ThemeStatusBar {
         let app: any = this.plugin.app;
 
         if (state) {
-            this.setPrintTheme(false);
+            // this.setPrintTheme(false);
 
             if (this.plugin.settings.themeBlackAndWhite) {
-                // Set temporary default theme preview
-                let theme: string = app.vault.getConfig("cssTheme");
-                app.customCss.setTheme("Default");
-                app.customCss.theme = theme;
-                app.vault.setConfig("cssTheme", theme);
+                // Get current theme (return to state later)
+                this.lastCssTheme = app.vault.getConfig("cssTheme");
+                this.lastTheme = app.getTheme();
 
-                // Set temporary light mode preview
-                let mode: string = app.getTheme();
-                app.changeTheme("moonstone");
-                app.vault.setConfig("theme", mode);
+                // Set temporary printer-theme preview
+                app.customCss.setTheme("Default");
+                app.vault.setConfig("theme", "moonstone");
             }
 
             // Enable css style
             document.body.classList.toggle("printer-mode", true);
         } else {
-            // Set original mode
-            app.changeTheme(app.vault.getConfig("theme"));
             // Set original theme
-            app.customCss.requestLoadTheme();
+            app.vault.setConfig("theme", this.lastTheme);
+            app.customCss.setTheme(this.lastCssTheme);
 
             // Disable css style
             document.body.classList.toggle("printer-mode", false);
