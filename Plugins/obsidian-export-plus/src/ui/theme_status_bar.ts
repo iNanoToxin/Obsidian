@@ -43,9 +43,11 @@ export class ThemeStatusBar {
     setPrintTheme(state: boolean) {
         let app: any = this.plugin.app;
 
-        if (state) {
-            // this.setPrintTheme(false);
+        if (this.enabled === state) {
+            return;
+        }
 
+        if (state) {
             if (this.plugin.settings.themeBlackAndWhite) {
                 // Get current theme (return to state later)
                 this.lastCssTheme = app.vault.getConfig("cssTheme");
